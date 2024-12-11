@@ -77,4 +77,4 @@ func main() {
 
 ## 感谢
 
-- [lich0821](https://github.com/lich0821) 提供的WeChatFerry项目
+- [lich0821](https://github.com/lich0821/WeChatFerry) 提供的WeChatFerry项目
