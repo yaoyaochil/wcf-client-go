@@ -141,14 +141,19 @@ func (c *ClientWCF) SendFile(receiver, filePath string) error {
 }
 
 // SendXml 发送XML消息
-func (c *ClientWCF) SendXml(receiver, content, path string, msgType uint64) error {
+// receiver: 接收者的wxid
+// xml: XML格式的消息内容
+// path: 图片路径(可选,部分XML消息需要附带图片)
+// type: 消息类型(如链接分享为49)
+func (c *ClientWCF) SendXml(receiver, xml, path string, msgType uint64) error {
+	// 构建请求
 	req := &pb.Request{
 		Func: pb.Functions_FUNC_SEND_XML,
 		Msg: &pb.Request_Xml{
 			Xml: &pb.XmlMsg{
-				Receiver: receiver, // 接收者
-				Content:  content,  // 内容
-				Path:     path,     // 路径
+				Receiver: receiver, // 接收消息的用户/群 wxid
+				Content:  xml,      // XML格式的消息内容
+				Path:     path,     // 图片路径(可选)
 				Type:     msgType,  // 消息类型
 			},
 		},
@@ -156,23 +161,24 @@ func (c *ClientWCF) SendXml(receiver, content, path string, msgType uint64) erro
 
 	data, err := proto.Marshal(req)
 	if err != nil {
-		return err
+		return fmt.Errorf("marshal request failed: %v", err)
 	}
 
 	resp, err := c.call(data)
 	if err != nil {
-		return err
+		return fmt.Errorf("call failed: %v", err)
 	}
 
 	var response pb.Response
 	if err := proto.Unmarshal(resp, &response); err != nil {
-		return err
+		return fmt.Errorf("unmarshal response failed: %v", err)
 	}
 
 	if response.Msg == nil {
 		return nil
 	}
 
+	// 处理响应
 	switch msg := response.Msg.(type) {
 	case *pb.Response_Status:
 		if msg.Status != 0 {

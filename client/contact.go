@@ -43,9 +43,7 @@ func (c *ClientWCF) GetSelfWxid() (string, error) {
 func (c *ClientWCF) GetContacts() ([]*pb.RpcContact, error) {
 	req := &pb.Request{
 		Func: pb.Functions_FUNC_GET_CONTACTS,
-		Msg: &pb.Request_Empty{
-			Empty: &pb.Empty{},
-		},
+		Msg:  nil,
 	}
 
 	data, err := proto.Marshal(req)
